@@ -39,16 +39,19 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
+	"os"
 
 	ollamatoadk "github.com/lopesgabriel/ollama-to-adk"
-	"google.golang.org/adk/model"
-	"google.golang.org/genai"
+	"google.golang.org/adk/agent"
+	"google.golang.org/adk/agent/llmagent"
+	"google.golang.org/adk/cmd/launcher"
+	"google.golang.org/adk/cmd/launcher/full"
 )
 
 func main() {
-	model, err := ollamatoadk.NewOllamaModel("llama3.2", "")
+	ctx := context.Background()
+	model, err := ollamatoadk.NewOllamaModel("qwen3.5:9b", "")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -59,10 +62,10 @@ func main() {
 		Description: "Hello World agent",
 		Instruction: `
 		You are a greeter agent, you will greet new contacts.
-		`
+		`,
 	})
 	if err != nil {
-		log.FatalF("Failed to create agent: %w", err)
+		log.Fatalf("Failed to create agent: %v", err)
 	}
 
 	config := &launcher.Config{
@@ -71,7 +74,7 @@ func main() {
 
 	l := full.NewLauncher()
 	if err = l.Execute(ctx, config, os.Args[1:]); err != nil {
-		log.FatalF("Run failed: %w (syntax: %s)", err, l.CommandLineSyntax())
+		log.Fatalf("Run failed: %v (syntax: %s)", err, l.CommandLineSyntax())
 	}
 }
 ```
